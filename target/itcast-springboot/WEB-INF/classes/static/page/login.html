@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<title>页面登陆</title>
+<script type="text/javascript" src="/page/common/jquery-2.2.3.js"></script>
+<style type="text/css">
+.systemTitle {
+	position: absolute;
+	left: 123px;
+	top: 20px;
+	width: 399px;
+	height: 40px;
+	font-family: 'Monaco', 'Monaco';
+	font-weight: 400;
+	font-style: normal;
+	font-size: 28px;
+}
+.login_m{ width:403px; margin:0 auto; height:375px; margin-top:15%; /*position: absolute;left:50%;top:50%;margin-left:-202px;margin-top:-188px;*/}
+.login_padding{ padding:28px 47px 20px 47px ;}
+.loginBox input.txt_input{ width:295px; height:36px; border:1px solid #cad2db; no-repeat;  padding:0 5px; -moz-border-radius:5px; -webkit-border-radius:5px; border-radius:5px; line-height:36px; margin-bottom:10px; font-size:14px; color:#717171; font-family:Arial;}
+.loginBox input.txt_input2{ margin-bottom:20px;}
+.loginBox input.txt_input:focus{ transition:border linear .2s,box-shadow linear .2s; -moz-transition:border linear .2s,-moz-box-shadow linear .2s; -webkit-transition:border linear .2s,-webkit-box-shadow linear .2s; outline:none;border-color:rgba(173,173,173.75); box-shadow:0 0 8px rgba(173,173,173,.5); -moz-box-shadow:0 0 8px rgba(173,173,173,.5); -webkit-box-shadow:0 0 8px rgba(173,173,173,3); border:1px solid #6192c8;}
+.rem_sub input.sub_button{ float:right; width:100px; height:35px; background-color:#5aa3f9; border-radius: 5px;border:none; color:#FFF; font-weight:bold;}
+.rem_sub input.sub_button:hover{  cursor:pointer;}
+
+</style>
+<script type="text/javascript" src="/page/common/util.js"></script>
+<script type='text/javascript'>
+
+    
+	function login() {
+	    var account=$("input[name='account']").val();
+	    var password=$("#password").val();
+		var optMsg = document.getElementById("optMsg");
+		if (account==""||password=="") {
+			optMsg.innerHTML = "账号或密码不能为空";
+		}else{
+			$.ajax({
+					url:Utils.getPath()+"/mngUser/addLogin",
+					type:"post",
+					data:{"account":account,"password":password},
+					dataType:"json",
+					success:function(result){
+						if(result.state==0){ //登录成功
+						sessionStorage.setItem("mgmtUser", JSON.stringify(result.data));//一旦窗口或者标签页被永久关闭了，存储的数据也就失效了。
+						window.location.href="index.html";
+						
+						}else if(result.state==1){//账号错误
+							$("#optMsg").html(result.message);
+							
+						}else if(result.state==2){//密码错误
+							$("#optMsg").html(result.message);
+						}
+					},
+					error:function(){
+						alert("登录失败");
+					}
+				});
+			
+		}
+	}
+ 	//注册页面跳转
+    function registeredJump() {
+		window.location.href="register.html";
+		
+		}
+	
+	 function keydown(){//键盘事件
+	 if(window.event.keyCode == 13){
+		 $('#btnLogin').click();
+ 		}
+ 	} 
+ 	
+	//页面加载时就出发点击事件，生成验证码
+	function loadVerifyFirst(){  
+	    document.getElementById("imgVerify").click();  
+	}    
+	//获取验证码
+  function getVerify(obj){
+    obj.src=Utils.getPath() + "/base/getVerify?"+Math.random();
+  }
+
+	//验证码校验(先校验验证码，再进行登录)
+  function checkVerify(){
+      var verify=$("#verify_input").val();
+      var optMsg = document.getElementById("optMsg");
+    	if(verify==""||verify==null){
+    	optMsg.innerHTML = "请输入验证码";
+    	return;
+    	}
+          $.ajax({
+					url:Utils.getPath()+"/base/checkVerify",
+					type:"post",
+					data:{"verify":verify},
+					dataType:"json",
+					success:function(result){
+						if(result==true){
+						login();//验证码检验成功后，在进行登录操作
+						}else{
+						optMsg.innerHTML = "验证码输入错误";
+						}
+						
+					},
+					error:function(){
+					alert("系统出错");
+					}
+				});
+}
+</script>
+</head>
+<!-- style="background:url(/page/common/images/img.jpg);font-size: 14px;" -->
+<body  onkeydown="keydown()" onload="loadVerifyFirst()">
+	
+	<div class="login_m">
+		<div class="loginBox">
+			<div class="login_padding" id="login_model">
+				<div style="text-align: center;font-size: 18px;">用户登录</div>
+				<form id="loginForm" style="margin:0 auto;">
+					<label>账号</label> <label> <input id="account "type="text"   name="account" class="txt_input txt_input2 notNull" />
+					
+					</label> <label>密码</label> <label> <input id="password" type="password"   class="txt_input notNull" />
+				
+					</label>
+					
+					<!-- 验证码 -->
+					<div class="row">
+						<div class="col-xs-6 pull_left">
+						   <input class="form-control" type="tel" id="verify_input" placeholder="请输入验证码" maxlength="4" 
+						           style="height:28px;width:40%; " />
+						       <a href="javascript:void(0);" title="点击更换验证码" >
+						            <img id="imgVerify" src="" alt="更换验证码" height="40" width="55%" style="vertical-align:middle;"
+						           onclick="getVerify(this)" >
+						        </a>
+						    </div>
+						    
+					</div>
+					
+					
+					<div class="rem_sub">
+						<label>  <input type="button" value="登陆" id="btnLogin"
+								onclick="checkVerify()" class="sub_button" />
+						</label>
+					    <label> <span id="Msg" class="err" style="color:red;"></span> <input type="button" value="注册" style="float:left;"
+								 class="sub_button" onclick="registeredJump()" />
+						</label>
+							
+					</div>
+					<br></br>
+					<div><span id="optMsg" class="errMsg" style="color:red;"></span></div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<br>
+	<br>
+	
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>  <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="demo.notebook.notebookDao">
+  
+    <!-- <select id="selectNoteBookList" parameterType="demo.notebook.notebookPojo" resultType="demo.notebook.notebookPojo">
+        SELECT * FROM cn_notebook WHERE cn_user_id = #{cn_user_id} 
+    </select> 查出来数据为null--> 
+   
+      <!-- 查询当前用户下的所有笔记 本-->
+      <!--    column:数据库中表的字段 property：数据库中表所有映射的实体类javaBean中的属性名 -->
+     <resultMap type="demo.notebook.notebookPojo" id="BaseResultMap">
+       
+        <result column="cn_notebook_id" property="cn_notebook_id"/>
+        <result column="cn_user_id" property="cn_user_id"/>
+        <result column="cn_notebook_type_id" property="cn_notebook_type_id"/>
+        <result column="cn_notebook_name" property="cn_notebook_name"/>
+        <result column="cn_notebook_desc" property="cn_notebook_desc"/>
+        <result column="cn_notebook_createtime" property="cn_notebook_createtime"/>
+    </resultMap>
+
+
+   <!--  这里的id必须和UserMapper接口中的接口方法名相同,resultMap和上面定义的id名字相同 -->
+    <select id="selectNoteBookList" resultMap="BaseResultMap" parameterType="demo.notebook.notebookPojo">
+         SELECT * FROM cn_notebook WHERE cn_user_id = #{cn_user_id} 
+    </select> 
+    
+    <select id="selectNoteBookById" resultType="String" parameterType="demo.notebook.notebookPojo">
+         SELECT * FROM cn_notebook WHERE cn_notebook_id = #{cn_notebook_id} 
+    </select> 
+    
+
+     <!-- 新增笔记本 -->
+	<insert id="addNoteBook" parameterType="demo.notebook.notebookPojo">
+		<![CDATA[ 
+			INSERT INTO cn_notebook (
+			  cn_notebook_id,cn_user_id,cn_notebook_type_id,cn_notebook_name,cn_notebook_desc,cn_notebook_createtime
+			) VALUES (
+				#{cn_notebook_id},#{cn_user_id},#{cn_notebook_type_id},#{cn_notebook_name},#{cn_notebook_desc},#{cn_notebook_createtime}
+				)
+		]]>
+	</insert> 	
+	
+	 <!-- 删除笔记本和笔记本下面的笔记 -->
+	<delete id="deleteNoteBook" parameterType="demo.notebook.notebookPojo">
+		<![CDATA[ 
+			DELETE notebook.* ,note.* FROM cn_notebook notebook LEFT JOIN  cn_note note ON notebook.cn_notebook_id = note.cn_notebook_id WHERE
+			notebook.cn_notebook_id in (${ids})
+		]]>
+	</delete> 	
+	
+	
+	
+	 
+</mapper>

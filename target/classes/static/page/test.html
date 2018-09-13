@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+    <head>
+        <title>demo</title>
+        <style type="text/css">
+            .main { position:relative}
+            #btn { border:none;cursor:pointer;background:#ccc }
+            .layer { position:absolute;height:30px;width:50px;background:#4cff00;display:none }
+        </style>
+        <script>
+            window.onload = function () {
+                function stopPropagation(e) {
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                    } else {
+                        e.cancelBubble = false;
+                    }
+                }
+                var btn = document.getElementById("btn");
+                var layer = document.getElementById("layer");
+                btn.onclick = function (e) {
+                   
+                    layer.style.display = "block";
+                    layer.style.left = "10px";
+                    layer.style.top = "50px";
+                    stopPropagation(e);
+                    
+                 
+                }
+                window.onclick = function (e) {
+                    layer.style.display = "none";
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="main">
+            <input  id="btn" type="button" value="点击"/>
+            <div class="layer" id="layer">
+ 
+            </div>
+        </div>
+    </body>
+</html>

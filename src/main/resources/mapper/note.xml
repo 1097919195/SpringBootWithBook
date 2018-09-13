@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>  <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="demo.note.noteDao">
+  
+    <!-- 查询当前用户下的所有笔记 -->
+    <!--column:数据库中表的字段  property：数据库中表所有映射的实体类javaBean中的属性名 -->
+     <resultMap id="BaseResultMap"  type="demo.note.notePojo" >
+        <result column="cn_note_id" property="cn_note_id"/>
+        <result column="cn_notebook_id" property="cn_notebook_id"/>
+        <result column="cn_user_id" property="cn_user_id"/>
+        <result column="cn_note_status_id" property="cn_note_status_id"/>
+        <result column="cn_note_type_id" property="cn_note_type_id"/>
+        <result column="cn_note_title" property="cn_note_title"/>
+        <result column="cn_note_body" property="cn_note_body" />
+        <result column="cn_note_create_time" property="cn_note_create_time"/>
+        <result column="cn_note_last_modify_time" property="cn_note_last_modify_time"/>
+    </resultMap>
+
+
+   <!--  这里的id必须和UserMapper接口中的接口方法名相同,resultMap和上面定义的id名字相同 -->
+    <select id="selectNoteList" parameterType="demo.note.notePojo" resultMap="BaseResultMap" >
+         SELECT * FROM cn_note WHERE cn_notebook_id = #{cn_notebook_id}
+    </select> 
+    		
+    		
+    		
+    		
+    <resultMap type="demo.note.notePojo" id="noteContentResultMap" >  
+         <result  property="cn_note_body" column="cn_note_body" jdbcType="LONGVARCHAR" /><!-- 解决实体类String类型与数据库表字段属性为text的联系 -->
+        <result column="cn_note_id" property="cn_note_id"/>
+        <result column="cn_notebook_id" property="cn_notebook_id"/>
+        <result column="cn_user_id" property="cn_user_id"/>
+        <result column="cn_note_status_id" property="cn_note_status_id"/>
+        <result column="cn_note_type_id" property="cn_note_type_id"/>
+        <result column="cn_note_title" property="cn_note_title"/>
+        <result column="cn_note_create_time" property="cn_note_create_time"/>
+        <result column="cn_note_last_modify_time" property="cn_note_last_modify_time"/>
+    </resultMap>  
+        <!--  查询某一笔记本下的笔记内容 -->
+     <select id="queryNoteContent" parameterType="demo.note.notePojo" resultMap="noteContentResultMap" >  
+          SELECT  * FROM cn_note WHERE cn_note_id = #{cn_note_id}
+     </select>  
+    		 
+     
+     <!-- 新增笔记 -->
+	<insert id="addNote" parameterType="demo.note.notePojo" >
+		<![CDATA[ 
+			INSERT INTO cn_note (
+			  cn_note_id,cn_notebook_id,cn_user_id,cn_note_status_id,cn_note_type_id,cn_note_title,cn_note_body,cn_note_create_time,cn_note_last_modify_time
+			) VALUES (
+				#{cn_note_id},#{cn_notebook_id},#{cn_user_id},#{cn_note_status_id},#{cn_note_type_id},#{cn_note_title},#{cn_note_body},#{cn_note_create_time}
+				,#{cn_note_last_modify_time}
+				)
+		]]>
+	</insert> 	
+  
+    <!-- 保存或修改笔记内容 -->
+	<update id="updateNoteContene" parameterType="demo.note.notePojo">
+		<![CDATA[ UPDATE cn_note]]>
+		<set>
+			<if test="cn_note_body != null"><![CDATA[ cn_note_body = #{cn_note_body},]]></if>
+			<if test="cn_note_title != null and cn_note_title!='' "><![CDATA[ cn_note_title = #{cn_note_title},]]></if>
+			<if test="cn_note_last_modify_time != null"><![CDATA[ cn_note_last_modify_time = #{cn_note_last_modify_time},]]></if>
+			
+		</set>
+		 <![CDATA[ where cn_note_id = #{cn_note_id} ]]>
+	</update>
+   
+   
+    <!-- 笔记搜索功能 -->
+    <resultMap type="demo.note.notePojo" id="notesMap" >  
+         <result  property="cn_note_body" column="cn_note_body" jdbcType="LONGVARCHAR" /><!-- 解决实体类String类型与数据库表字段属性为text的联系 -->
+        <result column="cn_note_id" property="cn_note_id"/>
+        <result column="cn_notebook_id" property="cn_notebook_id"/>
+        <result column="cn_user_id" property="cn_user_id"/>
+        <result column="cn_note_status_id" property="cn_note_status_id"/>
+        <result column="cn_note_type_id" property="cn_note_type_id"/>
+        <result column="cn_note_title" property="cn_note_title"/>
+        <result column="cn_note_create_time" property="cn_note_create_time"/>
+        <result column="cn_note_last_modify_time" property="cn_note_last_modify_time"/>
+        <result column="cn_notebook_name" property="cn_notebook_name"/>
+    </resultMap>  
+	 <!-- 笔记搜索功能 -->
+  <select id="serachNotes" resultMap="notesMap" parameterType="String">
+         SELECT  note.*,  notebook.* FROM cn_note note,cn_notebook notebook WHERE note.cn_notebook_id =notebook.cn_notebook_id
+         AND note.cn_note_title LIKE "%"#{name}"%"
+    </select> 
+    
+    
+    
+</mapper>
