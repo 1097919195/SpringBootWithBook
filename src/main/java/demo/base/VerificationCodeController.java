@@ -27,7 +27,24 @@ public class VerificationCodeController {
 	    try{
 	        //从session中获取随机数
 	        String random = (String) session.getAttribute("RANDOMVALIDATECODEKEY");
-	        if (random == null) {
+
+	        //如果前台返回的是个小写转换成大写
+			char[] chars = verify.toCharArray();
+			for (int i = 0, length = chars.length; i < length; i++) {
+				char c = chars[i];
+//				//判断字母是不是大写，如果是大写变为小写
+//				if (Character.isUpperCase(c)){
+//					chars[i] = Character.toLowerCase(c);
+//					continue;
+//				}
+				//如果为小写，变为大写
+				chars[i] = Character.toUpperCase(c);
+			}
+			verify = new String(chars);
+			System.err.println(verify);
+			System.err.println(random);
+
+			if (random == null) {
 	            return false;
 	        }
 	        if (random.equals(verify)) {
